@@ -13,31 +13,33 @@
 
   <div class="card full-card">
     <div class="card-accent-bar bar-amber"></div>
-    <div class="card-body" style="flex:1;overflow:auto">
-      <table>
-        <thead class="thead-amber">
-          <tr>
-            <th class="th-amber">Date</th><th class="th-amber">Product</th>
-            <th class="th-amber text-right">Qty</th><th class="th-amber text-right">Unit Price</th>
-            <th class="th-amber text-right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for s in sales %}
-          <tr>
-            <td style="color:#8B5E3C;white-space:nowrap">{{ s['sale_date'][:16] }}</td>
-            <td class="font-semi">{{ s['product_name'] }}</td>
-            <td class="text-right" style="color:#8B5E3C">{{ s['quantity'] }}</td>
-            <td class="text-right" style="color:#8B5E3C">${{ "%.2f"|format(s['unit_price']) }}</td>
-            <td class="text-right font-bold" style="color:#EA580C">${{ "%.2f"|format(s['total_amount']) }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="5"><div class="empty-state">
-            <div class="empty-icon">🧾</div><div class="empty-title">No sales yet</div>
-          </div></td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead class="thead-amber">
+            <tr>
+              <th class="th-amber">Date</th><th class="th-amber">Product</th>
+              <th class="th-amber text-end">Qty</th><th class="th-amber text-end">Unit Price</th>
+              <th class="th-amber text-end">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in sales %}
+            <tr>
+              <td style="color:#8B5E3C;white-space:nowrap">{{ s['sale_date'][:16] }}</td>
+              <td class="font-semi">{{ s['product_name'] }}</td>
+              <td class="text-end" style="color:#8B5E3C">{{ s['quantity'] }}</td>
+              <td class="text-end" style="color:#8B5E3C">${{ "%.2f"|format(s['unit_price']) }}</td>
+              <td class="text-end font-bold" style="color:#EA580C">${{ "%.2f"|format(s['total_amount']) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5"><div class="empty-state">
+              <div class="empty-icon">🧾</div><div class="empty-title">No sales yet</div>
+            </div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="table-footer">
       <span class="footer-label">Total Revenue Records</span>
@@ -52,15 +54,15 @@
     <form method="POST" action="{{ url_for('add_sale') }}">
       <div class="form-grid">
         <div class="form-group form-full"><label>Product *</label>
-          <select name="product_id" required>
+          <select name="product_id" required class="form-select">
             <option value="">— Select a product —</option>
             {% for p in products %}
             <option value="{{ p['id'] }}">{{ p['name'] }} (Stock: {{ p['quantity'] }}) — ${{ "%.2f"|format(p['price']) }}</option>
             {% endfor %}
           </select>
         </div>
-        <div class="form-group form-full"><label>Quantity *</label><input type="number" name="quantity" min="1" value="1" required/></div>
-        <div class="form-group form-full"><label>Notes (Optional)</label><input type="text" name="notes" placeholder="e.g. Online order #123"/></div>
+        <div class="form-group form-full"><label>Quantity *</label><input type="number" name="quantity" min="1" value="1" required class="form-control"/></div>
+        <div class="form-group form-full"><label>Notes (Optional)</label><input type="text" name="notes" class="form-control" placeholder="e.g. Online order #123"/></div>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn-cancel" onclick="closeModal('recordSaleModal')">Cancel</button>
