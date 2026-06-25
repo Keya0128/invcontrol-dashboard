@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% set active = "dashboard" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-subtitle">Welcome back — here's your stock overview</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card stat-card-amber">
+      <div><div class="stat-label">Total Products</div><div class="stat-value">{{ total_products }}</div></div>
+      <div class="stat-icon">📦</div>
+    </div>
+    <div class="stat-card stat-card-teal">
+      <div><div class="stat-label">Total Suppliers</div><div class="stat-value">{{ total_suppliers }}</div></div>
+      <div class="stat-icon">👥</div>
+    </div>
+    <div class="stat-card stat-card-fuchsia">
+      <div><div class="stat-label">Total Revenue</div><div class="stat-value">${{ "%.2f"|format(total_revenue) }}</div></div>
+      <div class="stat-icon">💵</div>
+    </div>
+    <div class="stat-card stat-card-rose">
+      <div><div class="stat-label">Low Stock Alerts</div><div class="stat-value">{{ low_stock_count }}</div></div>
+      <div class="stat-icon">🔔</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Sales by Category</span></div>
+      <div class="card-body chart-wrap">
+        {% if sales_by_cat %}
+          <canvas id="salesChart"></canvas>
+        {% else %}
+          <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-sub">No sales yet</div></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Stock Overview</span></div>
+      <div class="card-body">
+        <table>
+          <thead class="thead-default">
+            <tr>
+              <th class="th-default">Product</th>
+              <th class="th-default text-right">Qty</th>
+              <th class="th-default">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in stock_levels %}
+            <tr>
+              <td class="font-semi">{{ item['name'] }}</td>
+              <td class="text-right">{{ item['quantity'] }}</td>
+              <td>
+                {% if item['status']=='ok' %}<span class="badge badge-ok">ok</span>
+                {% elif item['status']=='low' %}<span class="badge badge-low">low</span>
+                {% else %}<span class="badge badge-out">out</span>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const cats = {{ sales_by_cat | map(attribute=0) | list | tojson }};
+const revs = {{ sales_by_cat | map(attribute=1) | list | tojson }};
+if(document.getElementById('salesChart')) {
+  new Chart(document.getElementById('salesChart'), {
+    type:'bar',
+    data:{ labels:cats, datasets:[{ label:'Revenue ($)', data:revs,
+      backgroundColor:['#D946EF','#10B981','#F59E0B','#F43F5E','#84CC16'],
+      borderRadius:8, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ label: ctx=>' $'+ctx.parsed.y.toFixed(2) }}},
+      scales:{ x:{grid:{display:false},border:{display:false}},
+               y:{grid:{color:'#F0E8E0'},border:{display:false},
+                  ticks:{callback:v=>'$'+v}}} }
+  });
+}
+</script>
+{% endblock %}

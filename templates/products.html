@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% set active = "products" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Products</div>
+      <div class="page-subtitle">Manage your inventory catalog</div>
+    </div>
+    <button class="btn btn-fuchsia" onclick="openModal('addProductModal')">＋ Add Product</button>
+  </div>
+
+  <div class="card full-card">
+    <div class="card-accent-bar bar-fuchsia"></div>
+    <div class="card-body">
+      <table>
+        <thead class="thead-fuchsia">
+          <tr>
+            <th class="th-fuchsia">SKU</th><th class="th-fuchsia">Name</th>
+            <th class="th-fuchsia">Category</th><th class="th-fuchsia text-right">Price</th>
+            <th class="th-fuchsia text-right">Qty</th><th class="th-fuchsia"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in products %}
+          {% set is_low = p['quantity'] < p['min_stock'] %}
+          <tr>
+            <td class="font-mono">{{ p['sku'] }}</td>
+            <td class="font-semi">{{ p['name'] }}</td>
+            <td>
+              {% if p['category']=='Electronics' %}<span class="badge badge-fuchsia">{{ p['category'] }}</span>
+              {% elif p['category']=='Furniture' %}<span class="badge badge-amber">{{ p['category'] }}</span>
+              {% elif p['category']=='Stationery' %}<span class="badge badge-blue">{{ p['category'] }}</span>
+              {% else %}<span class="badge badge-violet">{{ p['category'] }}</span>{% endif %}
+            </td>
+            <td class="text-right font-semi">${{ "%.2f"|format(p['price']) }}</td>
+            <td class="text-right">
+              {% if is_low %}<span class="badge badge-low">{{ p['quantity'] }} / {{ p['min_stock'] }}</span>
+              {% else %}<span class="badge badge-ok">{{ p['quantity'] }} / {{ p['min_stock'] }}</span>{% endif %}
+            </td>
+            <td class="text-right">
+              <form method="POST" action="{{ url_for('delete_product', id=p['id']) }}"
+                    onsubmit="return confirm('Delete {{ p['name'] }}?')">
+                <button type="submit" class="btn-ghost">🗑</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6"><div class="empty-state">
+            <div class="empty-icon">📦</div><div class="empty-title">No products yet</div>
+          </div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal">
+    <div class="modal-title modal-title-fuchsia">Add New Product</div>
+    <form method="POST" action="{{ url_for('add_product') }}">
+      <div class="form-grid">
+        <div class="form-group"><label>Name *</label><input type="text" name="name" required placeholder="Laptop Pro 15"/></div>
+        <div class="form-group"><label>SKU *</label><input type="text" name="sku" required placeholder="LAP-001"/></div>
+        <div class="form-group"><label>Category *</label><input type="text" name="category" required list="cat-list" placeholder="Electronics"/>
+          <datalist id="cat-list"><option value="Electronics"><option value="Furniture"><option value="Stationery"></datalist>
+        </div>
+        <div class="form-group"><label>Price ($)</label><input type="number" name="price" step="0.01" min="0" placeholder="0.00"/></div>
+        <div class="form-group"><label>Quantity</label><input type="number" name="quantity" min="0" value="0"/></div>
+        <div class="form-group"><label>Min Stock</label><input type="number" name="min_stock" min="0" value="10"/></div>
+        <div class="form-group form-full"><label>Supplier</label>
+          <select name="supplier_id"><option value="">— None —</option>
+            {% for s in suppliers %}<option value="{{ s['id'] }}">{{ s['name'] }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModal('addProductModal')">Cancel</button>
+        <button type="submit" class="btn btn-fuchsia" style="flex:1;justify-content:center">Save Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

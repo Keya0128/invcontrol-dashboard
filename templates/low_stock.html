@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% set active = "low_stock" %}
+{% block title %}Low Stock Alerts{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Low Stock Alerts</div>
+      <div class="page-subtitle">Items requiring immediate attention</div>
+    </div>
+    {% if items %}
+      <div class="alert-badge alert-badge-danger">⚠️ {{ items|length }} item{{ 's' if items|length != 1 }} below threshold</div>
+    {% else %}
+      <div class="alert-badge alert-badge-ok">✅ All stock levels optimal</div>
+    {% endif %}
+  </div>
+
+  <div class="card full-card">
+    <div class="card-accent-bar bar-rose"></div>
+    <div class="card-body">
+      <table>
+        <thead class="thead-rose">
+          <tr>
+            <th class="th-rose">Product</th><th class="th-rose">Category</th>
+            <th class="th-rose text-right">Current Qty</th><th class="th-rose text-right">Min Threshold</th>
+            <th class="th-rose text-center">Urgency</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>
+              <div class="font-bold" style="font-size:14px">{{ item['name'] }}</div>
+              <div class="font-mono" style="margin-top:2px">{{ item['sku'] }}</div>
+            </td>
+            <td style="color:#8B5E3C">{{ item['category'] }}</td>
+            <td class="text-right font-bold" style="color:#F43F5E;font-size:15px">{{ item['quantity'] }}</td>
+            <td class="text-right" style="color:#8B5E3C">{{ item['min_stock'] }}</td>
+            <td class="text-center">
+              {% if item['urgency']=='CRITICAL' %}<span class="badge urgency-critical">CRITICAL</span>
+              {% else %}<span class="badge urgency-reorder">REORDER SOON</span>{% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5"><div class="empty-state">
+            <div class="empty-icon">✅</div>
+            <div class="empty-title">All Stock Levels Optimal</div>
+            <div class="empty-sub">No products below minimum threshold.</div>
+          </div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
