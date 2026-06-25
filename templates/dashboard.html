@@ -48,28 +48,30 @@
     <div class="card">
       <div class="card-header"><span class="card-title">Stock Overview</span></div>
       <div class="card-body">
-        <table>
-          <thead class="thead-default">
-            <tr>
-              <th class="th-default">Product</th>
-              <th class="th-default text-right">Qty</th>
-              <th class="th-default">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in stock_levels %}
-            <tr>
-              <td class="font-semi">{{ item['name'] }}</td>
-              <td class="text-right">{{ item['quantity'] }}</td>
-              <td>
-                {% if item['status']=='ok' %}<span class="badge badge-ok">ok</span>
-                {% elif item['status']=='low' %}<span class="badge badge-low">low</span>
-                {% else %}<span class="badge badge-out">out</span>{% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="thead-default">
+              <tr>
+                <th class="th-default">Product</th>
+                <th class="th-default text-end">Qty</th>
+                <th class="th-default">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in stock_levels %}
+              <tr>
+                <td class="font-semi">{{ item['name'] }}</td>
+                <td class="text-end">{{ item['quantity'] }}</td>
+                <td>
+                  {% if item['status']=='ok' %}<span class="badge badge-ok">ok</span>
+                  {% elif item['status']=='low' %}<span class="badge badge-low">low</span>
+                  {% else %}<span class="badge badge-out">out</span>{% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
